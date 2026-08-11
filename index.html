@@ -55,84 +55,86 @@ System initialized. Type 'help' to see available commands.
     </div>
 
     <!-- JavaScript: The engine that processes the commands -->
-    <script>
+   <script>
         const outputDiv = document.getElementById('terminal-output');
         const inputField = document.getElementById('command-input');
+        
+        // Tracks if the player has hacked the server
+        let isRoot = false; 
 
-        // 1. Listen for the Enter key to be pressed
         inputField.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 const command = inputField.value.trim();
                 
-                // Echo the command to the screen like a real terminal
-                printOutput(`root@player:~# ${command}`);
+                // Change the prompt dynamically based on if they are root or not
+                const promptString = isRoot ? "root@target:~# " : "player@kali:~# ";
+                printOutput(promptString + command);
                 
-                // Run the game logic
                 processCommand(command);
                 
-                // Clear the input and scroll to the bottom
                 inputField.value = '';
                 outputDiv.scrollTop = outputDiv.scrollHeight; 
             }
         });
 
-        // 2. Helper function to print text to our terminal window
         function printOutput(text) {
             const newLine = document.createElement('div');
             newLine.textContent = text;
             outputDiv.appendChild(newLine);
         }
 
-        // 3. Game Logic: Process the simulated Linux commands
         function processCommand(cmd) {
-            // Split the input into an array (e.g., "nmap 10.0.0.5" becomes ["nmap", "10.0.0.5"])
             const args = cmd.split(' ');
             const baseCommand = args[0].toLowerCase();
 
             switch(baseCommand) {
                 case 'help':
-                    printOutput("Available commands: help, clear, ls, cat, nmap");
+                    printOutput("Available commands: help, clear, ls, cat, nmap, ssh");
                     break;
                 case 'clear':
-                    outputDiv.innerHTML = ''; // Wipes the screen
+                    outputDiv.innerHTML = ''; 
                     break;
                 case 'ls':
                     printOutput("target_ips.txt   mission_brief.md   flag.txt");
                     break;
                 case 'cat':
-    if (args[1] === "flag.txt") {
-        if (isRoot) {
-            printOutput("CTF{y0u_h4ck3d_th3_m41nfr4m3}");
-            printOutput("CONGRATULATIONS! You beat the level!");
-        } else {
-            printOutput("Permission denied. You must escalate privileges.");
-        }
-    } else if (args[1] === "target_ips.txt") {
-        printOutput("192.168.1.100\n192.168.1.101");
-    } else if (args[1] === "mission_brief.md") {
-        // This is the new part that fixes your error!
-        printOutput("MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.");
-    } else {
-        printOutput("cat: missing or invalid file name.");
-    }
+                    if (args[1] === "flag.txt") {
+                        if (isRoot) {
+                            printOutput("CTF{y0u_h4ck3d_th3_m41nfr4m3}");
+                            printOutput("CONGRATULATIONS! You beat the level!");
+                        } else {
+                            printOutput("Permission denied. You must escalate privileges.");
+                        }
+                    } else if (args[1] === "target_ips.txt") {
+                        printOutput("192.168.1.100\n192.168.1.101");
+                    } else if (args[1] === "mission_brief.md") {
+                        printOutput("MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.");
+                    } else {
+                        printOutput("cat: missing or invalid file name.");
+                    }
                     break;
                 case 'nmap':
-                    // Check if they provided an IP address to scan
                     if (args[1] === "192.168.1.100") {
                         printOutput(`Starting Nmap scan on ${args[1]}...`);
-                        // setTimeout creates a slight delay to simulate a real scan taking time
                         setTimeout(() => {
                             printOutput(`PORT   STATE SERVICE\n22/tcp open  ssh\n80/tcp open  http`);
-                            outputDiv.scrollTop = outputDiv.scrollHeight; // Auto-scroll again after delay
+                            outputDiv.scrollTop = outputDiv.scrollHeight; 
                         }, 1500);
-                    } else if (args[1]) {
-                        printOutput(`Starting Nmap scan on ${args[1]}...\nHost seems down. If it is really up, but blocking our ping probes, try -Pn`);
                     } else {
                         printOutput("Usage: nmap [target_ip]");
                     }
                     break;
+                case 'ssh':
+                    if (args[1] === "root@192.168.1.100" && args[2] === "admin123") {
+                        isRoot = true; 
+                        document.querySelector('.prompt').textContent = "root@target:~#";
+                        printOutput("Authentication successful. Welcome, root.");
+                    } else {
+                        printOutput("Usage: ssh [user]@[ip] [password]\nHint: Check your files for credentials.");
+                    }
+                    break;
                 case '':
-                    break; // Do nothing if they just press Enter on a blank line
+                    break; 
                 default:
                     printOutput(`bash: ${baseCommand}: command not found`);
             }
