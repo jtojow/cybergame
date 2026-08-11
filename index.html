@@ -100,13 +100,21 @@ System initialized. Type 'help' to see available commands.
                     printOutput("target_ips.txt   mission_brief.md   flag.txt");
                     break;
                 case 'cat':
-                    if (args[1] === "flag.txt") {
-                        printOutput("Permission denied. You must escalate privileges.");
-                    } else if (args[1] === "target_ips.txt") {
-                        printOutput("192.168.1.100\n192.168.1.101");
-                    } else {
-                        printOutput("cat: missing or invalid file name.");
-                    }
+    if (args[1] === "flag.txt") {
+        if (isRoot) {
+            printOutput("CTF{y0u_h4ck3d_th3_m41nfr4m3}");
+            printOutput("CONGRATULATIONS! You beat the level!");
+        } else {
+            printOutput("Permission denied. You must escalate privileges.");
+        }
+    } else if (args[1] === "target_ips.txt") {
+        printOutput("192.168.1.100\n192.168.1.101");
+    } else if (args[1] === "mission_brief.md") {
+        // This is the new part that fixes your error!
+        printOutput("MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.");
+    } else {
+        printOutput("cat: missing or invalid file name.");
+    }
                     break;
                 case 'nmap':
                     // Check if they provided an IP address to scan
