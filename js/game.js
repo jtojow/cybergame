@@ -122,9 +122,15 @@ function processCommand(cmd) {
         case 'whoami': printOutput(isRoot ? "root" : "player"); break;
         case 'pwd': printOutput(isRoot ? "/root" : "/home/player"); break;
         case 'ls':
-            if (currentLevel === 1) printOutput("target_ips.txt   mission_brief.md   flag.txt");
-            else printOutput("Directory is empty or unavailable.");
+            if (currentLevel === 1) {
+                printOutput("target_ips.txt   mission_brief.md   flag.txt");
+            } else if (currentLevel === 2) {
+                printOutput("instructions.txt   server_logs.txt");
+            } else {
+                printOutput("Directory is empty or unavailable.");
+            }
             break;
+            
         case 'cat':
             if (currentLevel === 1) {
                 if (args[1] === "flag.txt") {
@@ -133,8 +139,24 @@ function processCommand(cmd) {
                 } else if (args[1] === "target_ips.txt") printOutput("192.168.1.100\n192.168.1.101");
                 else if (args[1] === "mission_brief.md") printOutput("MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.");
                 else printOutput("cat: missing or invalid file name.");
-            } else printOutput("cat: missing or invalid file name.");
+            } else if (currentLevel === 2) {
+                if (args[1] === "instructions.txt") {
+                    printOutput("MISSION: A hacker breached our system. Analyze server_logs.txt to find their IP address.");
+                    printOutput("Submit the IP to the firewall using the command: submit [IP_ADDRESS]");
+                } else if (args[1] === "server_logs.txt") {
+                    printOutput("[INFO] User admin logged in from 10.0.0.5");
+                    printOutput("[INFO] Failed login attempt for user root from 192.168.1.50");
+                    printOutput("[WARN] Multiple failed logins from 192.168.1.50");
+                    printOutput("[CRITICAL] Unauthorized access detected from 203.0.113.42");
+                    printOutput("[INFO] System backup completed successfully");
+                } else {
+                    printOutput("cat: missing or invalid file name.");
+                }
+            } else {
+                printOutput("cat: missing or invalid file name.");
+            }
             break;
+            
         case 'nmap':
             if (currentLevel !== 1) {
                 printOutput("nmap: command not found or network unavailable.");
@@ -163,19 +185,41 @@ function processCommand(cmd) {
                 outputDiv.scrollTop = outputDiv.scrollHeight; 
             }, 1500);
             break;
+            
         case 'ssh':
             if (currentLevel === 1 && args[1] === "root@192.168.1.100" && args[2] === "admin123") {
                 isRoot = true; updatePrompt(); printOutput("Authentication successful. Welcome, root.");
             } else printOutput("Usage: ssh [user]@[ip] [password]");
             break;
+            
         case 'grep':
             if (currentLevel === 1 && args[2] === "mission_brief.md") {
                 const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
                 const match = fileContent.split('\n').find(line => line.toLowerCase().includes(args[1].toLowerCase()));
                 if (match) printOutput(match); 
-            } else printOutput("grep: Invalid usage or file.");
+            } else if (currentLevel === 2 && args[2] === "server_logs.txt") {
+                const logContent = "[INFO] User admin logged in from 10.0.0.5\n[INFO] Failed login attempt for user root from 192.168.1.50\n[WARN] Multiple failed logins from 192.168.1.50\n[CRITICAL] Unauthorized access detected from 203.0.113.42\n[INFO] System backup completed successfully";
+                const matches = logContent.split('\n').filter(line => line.toLowerCase().includes(args[1].toLowerCase()));
+                if (matches.length > 0) matches.forEach(match => printOutput(match));
+                else printOutput("grep: no matches found.");
+            } else {
+                printOutput("grep: Invalid usage or file.");
+            }
             break;
-        case '': break; 
-        default: printOutput(`bash: ${baseCommand}: command not found`);
+            
+        case 'submit':
+            if (currentLevel === 2) {
+                if (args[1] === "203.0.113.42") {
+                    printOutput("IP Address accepted. Firewall rule applied.");
+                    printOutput("SUCCESS! Flag: CTF{l0g_4n4lys1s_pr0}");
+                } else if (!args[1]) {
+                    printOutput("Usage: submit [IP_ADDRESS]");
+                } else {
+                    printOutput("Incorrect IP address. Access denied.");
+                }
+            } else {
+                printOutput("submit: command not found");
+            }
+            break;
     }
 }
