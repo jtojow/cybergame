@@ -24,7 +24,8 @@ function startLevel(levelNumber) {
     terminalScreen.style.display = 'none';
     burpScreen.style.display = 'none';
     
-    if (currentLevel === 1 || currentLevel === 2) {
+    // UPDATED: Using == for loose equality
+    if (currentLevel == 1 || currentLevel == 2) {
         terminalScreen.style.display = 'flex';
         outputDiv.innerHTML = '';
         isRoot = false;
@@ -34,7 +35,7 @@ function startLevel(levelNumber) {
         printOutput(`Initializing Exercise ${currentLevel}... Type 'help' to see your tools. Type 'exit' to return to the Hub.\n`);
         setTimeout(() => inputField.focus(), 10);
     } 
-    else if (currentLevel === 3) {
+    else if (currentLevel == 3) {
         burpScreen.style.display = 'flex';
         interceptorTextarea.value = '';
         websiteResponse.innerText = '';
@@ -121,10 +122,12 @@ function processCommand(cmd) {
         case 'exit': exitToHub(); break;
         case 'whoami': printOutput(isRoot ? "root" : "player"); break;
         case 'pwd': printOutput(isRoot ? "/root" : "/home/player"); break;
+        
         case 'ls':
-            if (currentLevel === 1) {
+            // UPDATED: Using == for loose equality
+            if (currentLevel == 1) {
                 printOutput("target_ips.txt   mission_brief.md   flag.txt");
-            } else if (currentLevel === 2) {
+            } else if (currentLevel == 2) {
                 printOutput("instructions.txt   server_logs.txt");
             } else {
                 printOutput("Directory is empty or unavailable.");
@@ -132,14 +135,15 @@ function processCommand(cmd) {
             break;
             
         case 'cat':
-            if (currentLevel === 1) {
+            // UPDATED: Using == for loose equality
+            if (currentLevel == 1) {
                 if (args[1] === "flag.txt") {
                     if (isRoot) printOutput("CTF{y0u_h4ck3d_th3_m41nfr4m3}\nCONGRATULATIONS! You beat Exercise 1!");
                     else printOutput("Permission denied. You must escalate privileges.");
                 } else if (args[1] === "target_ips.txt") printOutput("192.168.1.100\n192.168.1.101");
                 else if (args[1] === "mission_brief.md") printOutput("MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.");
                 else printOutput("cat: missing or invalid file name.");
-            } else if (currentLevel === 2) {
+            } else if (currentLevel == 2) {
                 if (args[1] === "instructions.txt") {
                     printOutput("MISSION: A hacker breached our system. Analyze server_logs.txt to find their IP address.");
                     printOutput("Submit the IP to the firewall using the command: submit [IP_ADDRESS]");
@@ -158,7 +162,7 @@ function processCommand(cmd) {
             break;
             
         case 'nmap':
-            if (currentLevel !== 1) {
+            if (currentLevel != 1) {
                 printOutput("nmap: command not found or network unavailable.");
                 break;
             }
@@ -187,17 +191,17 @@ function processCommand(cmd) {
             break;
             
         case 'ssh':
-            if (currentLevel === 1 && args[1] === "root@192.168.1.100" && args[2] === "admin123") {
+            if (currentLevel == 1 && args[1] === "root@192.168.1.100" && args[2] === "admin123") {
                 isRoot = true; updatePrompt(); printOutput("Authentication successful. Welcome, root.");
             } else printOutput("Usage: ssh [user]@[ip] [password]");
             break;
             
         case 'grep':
-            if (currentLevel === 1 && args[2] === "mission_brief.md") {
+            if (currentLevel == 1 && args[2] === "mission_brief.md") {
                 const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
                 const match = fileContent.split('\n').find(line => line.toLowerCase().includes(args[1].toLowerCase()));
                 if (match) printOutput(match); 
-            } else if (currentLevel === 2 && args[2] === "server_logs.txt") {
+            } else if (currentLevel == 2 && args[2] === "server_logs.txt") {
                 const logContent = "[INFO] User admin logged in from 10.0.0.5\n[INFO] Failed login attempt for user root from 192.168.1.50\n[WARN] Multiple failed logins from 192.168.1.50\n[CRITICAL] Unauthorized access detected from 203.0.113.42\n[INFO] System backup completed successfully";
                 const matches = logContent.split('\n').filter(line => line.toLowerCase().includes(args[1].toLowerCase()));
                 if (matches.length > 0) matches.forEach(match => printOutput(match));
@@ -208,7 +212,7 @@ function processCommand(cmd) {
             break;
             
         case 'submit':
-            if (currentLevel === 2) {
+            if (currentLevel == 2) {
                 if (args[1] === "203.0.113.42") {
                     printOutput("IP Address accepted. Firewall rule applied.");
                     printOutput("SUCCESS! Flag: CTF{l0g_4n4lys1s_pr0}");
@@ -222,7 +226,6 @@ function processCommand(cmd) {
             }
             break;
 
-        // NEW: This is the missing piece that handles unknown commands!
         case '': break; 
         default: printOutput(`bash: ${baseCommand}: command not found`);
     }
