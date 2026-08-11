@@ -280,8 +280,10 @@ username=${user}&password=guest123&role=user`;
                     } else if (currentLevel === 2) {
                         if (args[1] === "instructions.txt") {
                             printOutput("MISSION: A hacker breached our system. Analyze server_logs.txt to find their IP address.");
-                            printOutput("Submit the IP to the firewall using the command: submit [IP_ADDRESS]");
+                            printOutput("Send the IP to the firewall API using the following command:");
+                            printOutput('curl -X POST http://127.0.0.1/api/firewall -d "ip=[IP_ADDRESS]"');
                         } else if (args[1] === "server_logs.txt") {
+                            // (server logs remain the same) 
                             printOutput("[INFO] User admin logged in from 10.0.0.5");
                             printOutput("[INFO] Failed login attempt for user root from 192.168.1.50");
                             printOutput("[WARN] Multiple failed logins from 192.168.1.50");
