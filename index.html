@@ -15,44 +15,64 @@
             flex-direction: column;
         }
 
-        /* 1. THE HUB SCREEN STYLES */
+        /* THE HUB SCREEN STYLES */
         #hub-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; 
+            padding-top: 50px;
             height: 100%;
             text-align: center;
+            overflow-y: auto; 
         }
         
         .hub-title {
             font-size: 3em;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-shadow: 0 0 10px #00ff00;
+        }
+
+        .theme-section {
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            width: 80%;
+            max-width: 600px;
+            background-color: #111;
+        }
+
+        .theme-title {
+            font-size: 1.5em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #00ff00;
+            padding-bottom: 10px;
         }
 
         .level-btn {
             background-color: #00ff00;
             color: #0c0c0c;
             border: none;
-            padding: 15px 30px;
-            margin: 10px;
-            font-size: 1.2em;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1.1em;
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 5px;
-            width: 300px;
+            border-radius: 3px;
+            width: 100%; 
         }
 
         .level-btn:hover {
             background-color: #00cc00;
-            box-shadow: 0 0 15px #00ff00;
+            box-shadow: 0 0 10px #00ff00;
         }
 
-        /* 2. THE TERMINAL SCREEN STYLES (Hidden by default) */
+        /* THE TERMINAL SCREEN STYLES */
         #terminal-screen {
-            display: none; /* This hides the terminal when the page loads */
+            display: none; /* Hidden when the game loads */
             flex-direction: column;
             height: 100%;
             padding: 20px;
@@ -86,8 +106,19 @@
     <!-- THE HUB SCREEN HTML -->
     <div id="hub-screen">
         <div class="hub-title">CTF TRAINING HUB</div>
-        <button class="level-btn" onclick="startLevel(1)">Exercise 1: The SSH Backdoor</button>
-        <button class="level-btn" onclick="startLevel(2)">Exercise 2: Coming Soon</button>
+
+        <!-- THEME 1 -->
+        <div class="theme-section">
+            <h2 class="theme-title">Theme 1: Terminal & Network Recon</h2>
+            <button class="level-btn" onclick="startLevel(1)">Level 1: The SSH Backdoor</button>
+            <button class="level-btn" onclick="startLevel(2)">Level 2: Log Analysis (Coming Soon)</button>
+        </div>
+
+        <!-- THEME 2 -->
+        <div class="theme-section">
+            <h2 class="theme-title">Theme 2: Web App Penetration</h2>
+            <button class="level-btn" onclick="startLevel(3)">Level 1: Burp Suite Simulator (Coming Soon)</button>
+        </div>
     </div>
 
     <!-- THE TERMINAL SCREEN HTML -->
@@ -108,36 +139,31 @@
         const promptText = document.getElementById('prompt-text');
         
         let isRoot = false; 
-        let currentLevel = 0; // Tracks which exercise the player chose
+        let currentLevel = 0; 
         let commandHistory = [];
         let historyIndex = -1;
 
-        // --- NEW HUB LOGIC ---
+        // --- HUB CONTROL LOGIC ---
         
-        // This function runs when a user clicks a button on the hub
         function startLevel(levelNumber) {
-            currentLevel = levelNumber; // Save the chosen level
+            currentLevel = levelNumber; 
             
-            // Hide the hub and show the terminal
             hubScreen.style.display = 'none';
             terminalScreen.style.display = 'flex';
             
-            // Reset the terminal for a fresh start
             outputDiv.innerHTML = '';
             isRoot = false;
             commandHistory = [];
             historyIndex = -1;
             updatePrompt();
             
-            // Print a welcome message
             printOutput(`Initializing Exercise ${currentLevel}...`);
             printOutput(`Type 'help' to see your tools. Type 'exit' to return to the Hub.\n`);
             
-            // Automatically focus on the typing area
-            inputField.focus();
+            // Forces the browser to focus on the typing area so the player can just start typing
+            setTimeout(() => inputField.focus(), 10);
         }
 
-        // This function returns the player to the main menu
         function exitToHub() {
             terminalScreen.style.display = 'none';
             hubScreen.style.display = 'flex';
@@ -197,7 +223,7 @@
                     outputDiv.innerHTML = ''; 
                     break;
                 case 'exit':
-                    exitToHub(); // Runs our new function to leave the terminal
+                    exitToHub(); 
                     break;
                 case 'whoami':
                     printOutput(isRoot ? "root" : "player");
@@ -206,19 +232,16 @@
                     printOutput(isRoot ? "/root" : "/home/player");
                     break;
                 
-                // LEVEL-SPECIFIC COMMANDS
                 case 'ls':
-                    // We check which level we are on to show different files!
                     if (currentLevel === 1) {
                         printOutput("target_ips.txt   mission_brief.md   flag.txt");
-                    } else if (currentLevel === 2) {
-                        printOutput("web_server_logs.txt   instructions.txt");
+                    } else {
+                        printOutput("Directory is empty or unavailable.");
                     }
                     break;
 
                 case 'cat':
                     if (currentLevel === 1) {
-                        // Level 1 cat logic
                         if (args[1] === "flag.txt") {
                             if (isRoot) {
                                 printOutput("CTF{y0u_h4ck3d_th3_m41nfr4m3}");
@@ -233,13 +256,8 @@
                         } else {
                             printOutput("cat: missing or invalid file name.");
                         }
-                    } else if (currentLevel === 2) {
-                        // Level 2 cat logic (placeholder)
-                        if (args[1] === "instructions.txt") {
-                            printOutput("We need to build the Burp Suite simulator to beat this level!");
-                        } else {
-                            printOutput("cat: missing or invalid file name.");
-                        }
+                    } else {
+                        printOutput("cat: missing or invalid file name.");
                     }
                     break;
 
@@ -269,161 +287,11 @@
                     if (currentLevel === 1 && args[2] === "mission_brief.md") {
                         const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
                         const match = fileContent.split('\n').find(line => line.toLowerCase().includes(args[1].toLowerCase()));
-                        if (match) printOutput(match); 
+                        if (match) {
+                            printOutput(match); 
+                        }
                     } else {
                         printOutput("grep: Invalid usage or file.");
-                    }
-                    break;
-
-                case '':
-                    break; 
-                default:
-                    printOutput(`bash: ${baseCommand}: command not found`);
-            }
-        }
-    </script>
-</body>
-</html>
-
-    <!-- Your existing <script> tags go here! -->
-
-    <!-- JavaScript: The engine that processes the commands -->
-  <script>
-        const outputDiv = document.getElementById('terminal-output');
-        const inputField = document.getElementById('command-input');
-        
-        let isRoot = false; 
-        
-        // NEW: Variables to track command history
-        let commandHistory = [];
-        let historyIndex = -1;
-
-        // UPDATED: Changed from 'keypress' to 'keydown' to detect arrow keys
-        inputField.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const command = inputField.value.trim();
-                
-                // NEW: Save the command to history if it's not empty
-                if (command !== '') {
-                    commandHistory.push(command);
-                }
-                historyIndex = commandHistory.length; // Reset index to the bottom of the list
-                
-                const promptString = isRoot ? "root@target:~# " : "player@kali:~# ";
-                printOutput(promptString + command);
-                
-                processCommand(command);
-                
-                inputField.value = '';
-                outputDiv.scrollTop = outputDiv.scrollHeight; 
-
-            } else if (e.key === 'ArrowUp') {
-                // NEW: Handle Up Arrow
-                e.preventDefault(); // Stops the text cursor from jumping to the beginning
-                if (historyIndex > 0) {
-                    historyIndex--;
-                    inputField.value = commandHistory[historyIndex];
-                }
-            } else if (e.key === 'ArrowDown') {
-                // NEW: Handle Down Arrow
-                e.preventDefault();
-                if (historyIndex < commandHistory.length - 1) {
-                    historyIndex++;
-                    inputField.value = commandHistory[historyIndex];
-                } else {
-                    historyIndex = commandHistory.length;
-                    inputField.value = ''; // Clear the input if they scroll back to the very bottom
-                }
-            }
-        });
-
-        function printOutput(text) {
-            const newLine = document.createElement('div');
-            newLine.textContent = text;
-            outputDiv.appendChild(newLine);
-        }
-
-        function processCommand(cmd) {
-            const args = cmd.split(' ');
-            const baseCommand = args[0].toLowerCase();
-
-            switch(baseCommand) {
-                case 'help':
-                    printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep");
-                    break;
-                case 'clear':
-                    outputDiv.innerHTML = ''; 
-                    break;
-                case 'ls':
-                    printOutput("target_ips.txt   mission_brief.md   flag.txt");
-                    break;
-                case 'cat':
-                    if (args[1] === "flag.txt") {
-                        if (isRoot) {
-                            printOutput("CTF{y0u_h4ck3d_th3_m41nfr4m3}");
-                            printOutput("CONGRATULATIONS! You beat the level!");
-                        } else {
-                            printOutput("Permission denied. You must escalate privileges.");
-                        }
-                    } else if (args[1] === "target_ips.txt") {
-                        printOutput("192.168.1.100\n192.168.1.101");
-                    } else if (args[1] === "mission_brief.md") {
-                        printOutput("MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.");
-                    } else {
-                        printOutput("cat: missing or invalid file name.");
-                    }
-                    break;
-                case 'nmap':
-                    if (args[1] === "192.168.1.100") {
-                        printOutput(`Starting Nmap scan on ${args[1]}...`);
-                        setTimeout(() => {
-                            printOutput(`PORT   STATE SERVICE\n22/tcp open  ssh\n80/tcp open  http`);
-                            outputDiv.scrollTop = outputDiv.scrollHeight; 
-                        }, 1500);
-                    } else {
-                        printOutput("Usage: nmap [target_ip]");
-                    }
-                    break;
-                case 'ssh':
-                    if (args[1] === "root@192.168.1.100" && args[2] === "admin123") {
-                        isRoot = true; 
-                        document.querySelector('.prompt').textContent = "root@target:~#";
-                        printOutput("Authentication successful. Welcome, root.");
-                    } else {
-                        printOutput("Usage: ssh [user]@[ip] [password]\nHint: Check your files for credentials.");
-                    }
-                    break;
-                
-                // NEW: whoami command
-                case 'whoami':
-                    printOutput(isRoot ? "root" : "player");
-                    break;
-
-                // NEW: pwd (print working directory) command
-                case 'pwd':
-                    printOutput(isRoot ? "/root" : "/home/player");
-                    break;
-
-                // NEW: grep (search text) command
-                case 'grep':
-                    if (!args[1] || !args[2]) {
-                        printOutput("Usage: grep [search_term] [file_name]");
-                    } else if (args[2] === "mission_brief.md") {
-                        // Store the file content to search through
-                        const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
-                        
-                        // Split the content into an array of individual lines
-                        const lines = fileContent.split('\n');
-                        
-                        // Look for a line that includes the player's search term
-                        const match = lines.find(line => line.toLowerCase().includes(args[1].toLowerCase()));
-                        
-                        if (match) {
-                            printOutput(match); // Print the line if found
-                        }
-                        // If no match is found, grep typically prints nothing, so we do nothing here.
-                    } else {
-                        printOutput(`grep: ${args[2]}: No such file or directory`);
                     }
                     break;
 
