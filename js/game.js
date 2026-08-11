@@ -116,20 +116,20 @@ function processCommand(cmd) {
     const args = cmd.split(' ');
     const baseCommand = args[0].toLowerCase();
     switch(baseCommand) {
-        case 'help': printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, exit"); break;
+        case 'help': printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, submit, exit"); break;
         case 'clear': outputDiv.innerHTML = ''; break;
         case 'exit': exitToHub(); break;
         case 'whoami': printOutput(isRoot ? "root" : "player"); break;
         case 'pwd': printOutput(isRoot ? "/root" : "/home/player"); break;
         case 'ls':
-    if (currentLevel === 1) {
-        printOutput("target_ips.txt   mission_brief.md   flag.txt");
-    } else if (currentLevel === 2) {
-        printOutput("instructions.txt   server_logs.txt");
-    } else {
-        printOutput("Directory is empty or unavailable.");
-    }
-    break;
+            if (currentLevel === 1) {
+                printOutput("target_ips.txt   mission_brief.md   flag.txt");
+            } else if (currentLevel === 2) {
+                printOutput("instructions.txt   server_logs.txt");
+            } else {
+                printOutput("Directory is empty or unavailable.");
+            }
+            break;
             
         case 'cat':
             if (currentLevel === 1) {
@@ -221,5 +221,9 @@ function processCommand(cmd) {
                 printOutput("submit: command not found");
             }
             break;
+
+        // NEW: This is the missing piece that handles unknown commands!
+        case '': break; 
+        default: printOutput(`bash: ${baseCommand}: command not found`);
     }
 }
