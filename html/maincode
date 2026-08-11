@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CTF Hacker Game</title>
+    <!-- This links to your new CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- THE HUB SCREEN -->
+    <div id="hub-screen">
+        <div class="hub-title">CTF TRAINING HUB</div>
+        <div class="theme-section">
+            <h2 class="theme-title">Theme 1: Terminal & Network Recon</h2>
+            <button class="level-btn" onclick="startLevel(1)">Level 1: The SSH Backdoor</button>
+            <button class="level-btn" onclick="startLevel(2)">Level 2: Log Analysis (Coming Soon)</button>
+        </div>
+        <div class="theme-section">
+            <h2 class="theme-title">Theme 2: Web App Penetration</h2>
+            <button class="level-btn" onclick="startLevel(3)">Level 1: Parameter Tampering</button> 
+        </div>
+    </div>
+
+    <!-- THE TERMINAL SCREEN -->
+    <div id="terminal-screen">
+        <div id="terminal-output"></div>
+        <div class="input-line">
+            <span class="prompt" id="prompt-text">player@kali:~#</span>
+            <input type="text" id="command-input" autocomplete="off">
+        </div>
+    </div>
+
+    <!-- THE BURP SUITE SCREEN -->
+    <div id="burp-screen">
+        <button class="exit-btn" onclick="exitToHub()">Exit to Hub</button>
+        
+        <!-- Left Side: Fake Target Website -->
+        <div class="panel" id="target-website">
+            <div class="panel-title">Target: Employee Portal</div>
+            <div class="fake-form">
+                <p>Welcome to the secure employee portal. Please log in.</p>
+                <input type="text" id="fake-username" placeholder="Username" value="guest">
+                <input type="password" id="fake-password" placeholder="Password" value="guest123">
+                <button onclick="triggerIntercept()">Log In</button>
+                <div id="website-response" style="margin-top: 20px; color: yellow;"></div>
+            </div>
+        </div>
+
+        <!-- Right Side: Interceptor Proxy -->
+        <div class="panel" id="proxy-panel">
+            <div class="panel-title" style="color: #ffa500; border-color: #ffa500;">Proxy Interceptor (Intercept is ON)</div>
+            <textarea id="interceptor-textarea" placeholder="Waiting for web request..."></textarea>
+            <div id="interceptor-controls">
+                <button class="proxy-btn" onclick="forwardRequest()">Forward</button>
+                <button class="proxy-btn" onclick="dropRequest()" style="background-color: #555; color: white;">Drop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- This links to your new JavaScript file -->
+    <script src="game.js"></script>
+</body>
+</html>
