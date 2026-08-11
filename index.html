@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>CTF Hacker Game</title>
+    <!-- This links to your new CSS file -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,7 +14,7 @@
         <div class="theme-section">
             <h2 class="theme-title">Theme 1: Terminal & Network Recon</h2>
             <button class="level-btn" onclick="startLevel(1)">Level 1: The SSH Backdoor</button>
-            <button class="level-btn" onclick="startLevel(2)">Level 2: Log Analysis</button>
+            <button class="level-btn" onclick="startLevel(2)">Level 2: Log Analysis (Coming Soon)</button>
         </div>
         <div class="theme-section">
             <h2 class="theme-title">Theme 2: Web App Penetration</h2>
@@ -33,6 +34,8 @@
     <!-- THE BURP SUITE SCREEN -->
     <div id="burp-screen">
         <button class="exit-btn" onclick="exitToHub()">Exit to Hub</button>
+        
+        <!-- Left Side: Fake Target Website -->
         <div class="panel" id="target-website">
             <div class="panel-title">Target: Employee Portal</div>
             <div class="fake-form">
@@ -43,6 +46,8 @@
                 <div id="website-response" style="margin-top: 20px; color: yellow;"></div>
             </div>
         </div>
+
+        <!-- Right Side: Interceptor Proxy -->
         <div class="panel" id="proxy-panel">
             <div class="panel-title" style="color: #ffa500; border-color: #ffa500;">Proxy Interceptor (Intercept is ON)</div>
             <textarea id="interceptor-textarea" placeholder="Waiting for web request..."></textarea>
@@ -53,7 +58,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Link -->
+    <!-- This links to your new JavaScript file -->
     <script src="game.js"></script>
 </body>
 </html>
