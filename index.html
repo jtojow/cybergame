@@ -347,13 +347,13 @@ username=${user}&password=guest123&role=user`;
                     }
                     break;
                     
-                case 'submit':
+                case 'curl':
                     if (currentLevel === 2) {
                         if (args[1] === "203.0.113.42") {
                             printOutput("IP Address accepted. Firewall rule applied.");
                             printOutput("SUCCESS! Flag: CTF{l0g_4n4lys1s_pr0}");
                         } else if (!args[1]) {
-                            printOutput("Usage: submit [IP_ADDRESS]");
+                            printOutput("Usage: curl [IP_ADDRESS]");
                         } else {
                             printOutput("Incorrect IP address. Access denied.");
                         }
