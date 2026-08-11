@@ -46,10 +46,10 @@
         .prompt { margin-right: 10px; color: #00ff00; }
         input[type="text"] { background-color: transparent; border: none; color: #00ff00; font-family: 'Courier New', Courier, monospace; font-size: 16px; flex-grow: 1; outline: none; }
 
-        /* 3. NEW: THE BURP SUITE SCREEN STYLES */
+        /* 3. THE BURP SUITE SCREEN STYLES */
         #burp-screen {
-            display: none; /* Hidden by default */
-            flex-direction: row; /* Split screen layout */
+            display: none;
+            flex-direction: row;
             height: 100%;
             padding: 20px;
             box-sizing: border-box;
@@ -68,16 +68,14 @@
 
         .panel-title { font-size: 1.5em; text-align: center; margin-bottom: 20px; border-bottom: 1px solid #00ff00; padding-bottom: 10px;}
         
-        /* Fake Website Styles */
         .fake-form { display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 0 auto; }
         .fake-form input { padding: 10px; font-family: inherit; }
         .fake-form button { padding: 10px; background-color: #00ff00; font-weight: bold; cursor: pointer; border: none; }
         
-        /* Interceptor Styles */
         #interceptor-textarea {
             flex-grow: 1;
             background-color: #000;
-            color: #ffa500; /* Orange text to stand out like a proxy tool */
+            color: #ffa500;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             padding: 10px;
@@ -89,7 +87,6 @@
         
         #interceptor-controls { display: flex; gap: 10px; justify-content: center; }
         .proxy-btn { padding: 10px 20px; font-weight: bold; cursor: pointer; background-color: #ffa500; border: none; }
-        
         .exit-btn { position: absolute; top: 10px; right: 20px; background: red; color: white; border: none; padding: 5px 10px; cursor: pointer; }
     </style>
 </head>
@@ -101,11 +98,10 @@
         <div class="theme-section">
             <h2 class="theme-title">Theme 1: Terminal & Network Recon</h2>
             <button class="level-btn" onclick="startLevel(1)">Level 1: The SSH Backdoor</button>
-            <button class="level-btn" onclick="startLevel(2)">Level 2: Log Analysis (Coming Soon)</button>
+            <button class="level-btn" onclick="startLevel(2)">Level 2: Log Analysis</button>
         </div>
         <div class="theme-section">
             <h2 class="theme-title">Theme 2: Web App Penetration</h2>
-            <!-- Changed this button to load Level 3 -->
             <button class="level-btn" onclick="startLevel(3)">Level 1: Parameter Tampering</button> 
         </div>
     </div>
@@ -119,11 +115,9 @@
         </div>
     </div>
 
-    <!-- 3. NEW: THE BURP SUITE SCREEN HTML -->
+    <!-- 3. THE BURP SUITE SCREEN HTML -->
     <div id="burp-screen">
         <button class="exit-btn" onclick="exitToHub()">Exit to Hub</button>
-        
-        <!-- Left Side: Fake Target Website -->
         <div class="panel" id="target-website">
             <div class="panel-title">Target: Employee Portal</div>
             <div class="fake-form">
@@ -134,8 +128,6 @@
                 <div id="website-response" style="margin-top: 20px; color: yellow;"></div>
             </div>
         </div>
-
-        <!-- Right Side: Interceptor Proxy -->
         <div class="panel" id="proxy-panel">
             <div class="panel-title" style="color: #ffa500; border-color: #ffa500;">Proxy Interceptor (Intercept is ON)</div>
             <textarea id="interceptor-textarea" placeholder="Waiting for web request..."></textarea>
@@ -148,12 +140,10 @@
 
     <!-- THE JAVASCRIPT LOGIC -->
     <script>
-        // --- SCREEN ROUTING VARIABLES ---
         const hubScreen = document.getElementById('hub-screen');
         const terminalScreen = document.getElementById('terminal-screen');
         const burpScreen = document.getElementById('burp-screen'); 
         
-        // --- TERMINAL VARIABLES ---
         const outputDiv = document.getElementById('terminal-output');
         const inputField = document.getElementById('command-input');
         const promptText = document.getElementById('prompt-text');
@@ -162,22 +152,18 @@
         let commandHistory = [];
         let historyIndex = -1;
 
-        // --- BURP SUITE VARIABLES ---
         const interceptorTextarea = document.getElementById('interceptor-textarea');
         const websiteResponse = document.getElementById('website-response');
         const fakeUsername = document.getElementById('fake-username');
 
-        // --- HUB CONTROL LOGIC ---
         function startLevel(levelNumber) {
-            currentLevel = levelNumber; 
+            currentLevel = parseInt(levelNumber); 
             
-            // Hide all screens first
             hubScreen.style.display = 'none';
             terminalScreen.style.display = 'none';
             burpScreen.style.display = 'none';
             
             if (currentLevel === 1 || currentLevel === 2) {
-                // Show Terminal
                 terminalScreen.style.display = 'flex';
                 outputDiv.innerHTML = '';
                 isRoot = false;
@@ -188,7 +174,6 @@
                 setTimeout(() => inputField.focus(), 10);
             } 
             else if (currentLevel === 3) {
-                // Show Burp Suite Screen
                 burpScreen.style.display = 'flex';
                 interceptorTextarea.value = '';
                 websiteResponse.innerText = '';
@@ -203,12 +188,8 @@
 
         function updatePrompt() { promptText.textContent = isRoot ? "root@target:~#" : "player@kali:~#"; }
 
-        // --- NEW: BURP SUITE LOGIC ---
-        
-        // This runs when the user clicks "Log In" on the fake website
         function triggerIntercept() {
             const user = fakeUsername.value;
-            // Generate a fake HTTP POST request
             const fakeHttpRequest = 
 `POST /api/login HTTP/1.1
 Host: secure-portal.local
@@ -217,22 +198,16 @@ User-Agent: Mozilla/5.0
 
 username=${user}&password=guest123&role=user`;
 
-            // Populate the proxy text area
             interceptorTextarea.value = fakeHttpRequest;
             websiteResponse.innerText = "Request intercepted! Modifying data in proxy...";
         }
 
-        // This runs when the user clicks "Forward" in the proxy
         function forwardRequest() {
             const modifiedRequest = interceptorTextarea.value;
-            
-            // Safety check in case they click forward before intercepting
             if (modifiedRequest === '') {
                 websiteResponse.innerText = "Error: No request to forward.";
                 return;
             }
-
-            // Check if the player successfully modified the role parameter
             if (modifiedRequest.includes('role=admin')) {
                 websiteResponse.style.color = "#00ff00";
                 websiteResponse.innerText = "SUCCESS! Flag: CTF{param_t4mp3r1ng_m4st3r}\nWelcome, Administrator.";
@@ -240,19 +215,15 @@ username=${user}&password=guest123&role=user`;
                 websiteResponse.style.color = "red";
                 websiteResponse.innerText = "Access Denied. You are logged in as a normal user. You need admin rights to see the flag.";
             }
-            
-            interceptorTextarea.value = ''; // Clear proxy
+            interceptorTextarea.value = ''; 
         }
 
-        // This runs if they click "Drop"
         function dropRequest() {
             interceptorTextarea.value = '';
             websiteResponse.style.color = "yellow";
             websiteResponse.innerText = "Request dropped by proxy.";
         }
 
-
-        // --- TERMINAL LOGIC (Unchanged) ---
         inputField.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const command = inputField.value.trim();
@@ -282,15 +253,22 @@ username=${user}&password=guest123&role=user`;
             const args = cmd.split(' ');
             const baseCommand = args[0].toLowerCase();
             switch(baseCommand) {
-                case 'help': printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, exit"); break;
+                case 'help': printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, submit, exit"); break;
                 case 'clear': outputDiv.innerHTML = ''; break;
                 case 'exit': exitToHub(); break;
                 case 'whoami': printOutput(isRoot ? "root" : "player"); break;
                 case 'pwd': printOutput(isRoot ? "/root" : "/home/player"); break;
+                
                 case 'ls':
-                    if (currentLevel === 1) printOutput("target_ips.txt   mission_brief.md   flag.txt");
-                    else printOutput("Directory is empty or unavailable.");
+                    if (currentLevel === 1) {
+                        printOutput("target_ips.txt   mission_brief.md   flag.txt");
+                    } else if (currentLevel === 2) {
+                        printOutput("instructions.txt   server_logs.txt");
+                    } else {
+                        printOutput("Directory is empty or unavailable.");
+                    }
                     break;
+                    
                 case 'cat':
                     if (currentLevel === 1) {
                         if (args[1] === "flag.txt") {
@@ -299,26 +277,89 @@ username=${user}&password=guest123&role=user`;
                         } else if (args[1] === "target_ips.txt") printOutput("192.168.1.100\n192.168.1.101");
                         else if (args[1] === "mission_brief.md") printOutput("MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.");
                         else printOutput("cat: missing or invalid file name.");
-                    } else printOutput("cat: missing or invalid file name.");
+                    } else if (currentLevel === 2) {
+                        if (args[1] === "instructions.txt") {
+                            printOutput("MISSION: A hacker breached our system. Analyze server_logs.txt to find their IP address.");
+                            printOutput("Submit the IP to the firewall using the command: submit [IP_ADDRESS]");
+                        } else if (args[1] === "server_logs.txt") {
+                            printOutput("[INFO] User admin logged in from 10.0.0.5");
+                            printOutput("[INFO] Failed login attempt for user root from 192.168.1.50");
+                            printOutput("[WARN] Multiple failed logins from 192.168.1.50");
+                            printOutput("[CRITICAL] Unauthorized access detected from 203.0.113.42");
+                            printOutput("[INFO] System backup completed successfully");
+                        } else {
+                            printOutput("cat: missing or invalid file name.");
+                        }
+                    } else {
+                        printOutput("cat: missing or invalid file name.");
+                    }
                     break;
+                    
                 case 'nmap':
-                    if (currentLevel === 1 && args[1] === "192.168.1.100") {
-                        printOutput(`Starting Nmap scan on ${args[1]}...`);
-                        setTimeout(() => { printOutput(`PORT   STATE SERVICE\n22/tcp open  ssh\n80/tcp open  http`); outputDiv.scrollTop = outputDiv.scrollHeight; }, 1500);
-                    } else printOutput("Usage: nmap [target_ip]");
+                    if (currentLevel !== 1) {
+                        printOutput("nmap: command not found or network unavailable.");
+                        break;
+                    }
+                    const fullCommand = args.join(' ');
+                    const targetIP = "192.168.1.100";
+                    if (!fullCommand.includes(targetIP)) {
+                        printOutput("Usage: nmap [flags] [target_ip]");
+                        printOutput("Hint: Did you check your target_ips.txt file?");
+                        break;
+                    }
+                    const usedVersionFlag = fullCommand.includes('-sV');
+                    printOutput(`Starting Nmap scan on ${targetIP}...`);
+                    setTimeout(() => {
+                        if (usedVersionFlag) {
+                            printOutput(`PORT   STATE SERVICE VERSION`);
+                            printOutput(`22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5`);
+                            printOutput(`80/tcp open  http    Apache httpd 2.4.41`);
+                        } else {
+                            printOutput(`PORT   STATE SERVICE`);
+                            printOutput(`22/tcp open  ssh`);
+                            printOutput(`80/tcp open  http`);
+                            printOutput(`\nHint: Try using the '-sV' flag to determine the service versions!`);
+                        }
+                        outputDiv.scrollTop = outputDiv.scrollHeight; 
+                    }, 1500);
                     break;
+                    
                 case 'ssh':
                     if (currentLevel === 1 && args[1] === "root@192.168.1.100" && args[2] === "admin123") {
                         isRoot = true; updatePrompt(); printOutput("Authentication successful. Welcome, root.");
                     } else printOutput("Usage: ssh [user]@[ip] [password]");
                     break;
+                    
                 case 'grep':
                     if (currentLevel === 1 && args[2] === "mission_brief.md") {
                         const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
                         const match = fileContent.split('\n').find(line => line.toLowerCase().includes(args[1].toLowerCase()));
                         if (match) printOutput(match); 
-                    } else printOutput("grep: Invalid usage or file.");
+                    } else if (currentLevel === 2 && args[2] === "server_logs.txt") {
+                        const logContent = "[INFO] User admin logged in from 10.0.0.5\n[INFO] Failed login attempt for user root from 192.168.1.50\n[WARN] Multiple failed logins from 192.168.1.50\n[CRITICAL] Unauthorized access detected from 203.0.113.42\n[INFO] System backup completed successfully";
+                        const matches = logContent.split('\n').filter(line => line.toLowerCase().includes(args[1].toLowerCase()));
+                        if (matches.length > 0) matches.forEach(match => printOutput(match));
+                        else printOutput("grep: no matches found.");
+                    } else {
+                        printOutput("grep: Invalid usage or file.");
+                    }
                     break;
+                    
+                case 'submit':
+                    if (currentLevel === 2) {
+                        if (args[1] === "203.0.113.42") {
+                            printOutput("IP Address accepted. Firewall rule applied.");
+                            printOutput("SUCCESS! Flag: CTF{l0g_4n4lys1s_pr0}");
+                        } else if (!args[1]) {
+                            printOutput("Usage: submit [IP_ADDRESS]");
+                        } else {
+                            printOutput("Incorrect IP address. Access denied.");
+                        }
+                    } else {
+                        printOutput("submit: command not found");
+                    }
+                    break;
+
                 case '': break; 
                 default: printOutput(`bash: ${baseCommand}: command not found`);
             }
