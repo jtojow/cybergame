@@ -1,112 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Cybersecurity Phishing Simulator</title>
-    <!-- CSS is used to style the app and make it look nice -->
+    <meta charset="UTF-8">
+    <title>CTF Terminal Simulator</title>
+    <!-- CSS for the hacker terminal aesthetic -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #0c0c0c;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
             display: flex;
-            justify-content: center;
-            padding-top: 50px;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
         }
-        .game-window {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-            width: 450px;
-            text-align: center;
-        }
-        #scenario-message {
-            color: blue;
-            font-size: 18px;
-            margin: 20px 0;
-            min-height: 80px;
-        }
-        button {
-            padding: 10px 20px;
+        #terminal-output {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
             font-size: 16px;
-            margin: 10px;
-            cursor: pointer;
-            border: 2px solid #333;
-            background-color: white;
-            border-radius: 5px;
         }
-        button:hover {
-            background-color: #eee;
+        .input-line {
+            display: flex;
+            font-size: 16px;
+        }
+        .prompt {
+            margin-right: 10px;
+            color: #00ff00;
+        }
+        /* Makes the input field blend into the terminal background */
+        input[type="text"] {
+            background-color: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            flex-grow: 1;
+            outline: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- HTML creates the visible elements on the screen -->
-    <div class="game-window">
-        <h2>Is this message Safe or Phishing?</h2>
-        <p id="scenario-message">Loading message...</p>
-        
-        <!-- These buttons trigger our JavaScript function when clicked -->
-        <button onclick="checkAnswer('S')">Safe</button>
-        <button onclick="checkAnswer('P')">Phishing</button>
+    <!-- HTML: The visual structure of the terminal -->
+    <div id="terminal-output">Welcome to CTF-OS v1.0.0
+System initialized. Type 'help' to see available commands.
+</div>
+    <div class="input-line">
+        <span class="prompt">root@player:~#</span>
+        <input type="text" id="command-input" autocomplete="off" autofocus>
     </div>
 
-    <!-- JavaScript handles the game logic, just like our Python code did -->
+    <!-- JavaScript: The engine that processes the commands -->
     <script>
-        // 1. Game Data
-        const scenarios = [
-            {
-                message: "URGENT: Your bank account will be locked in 24 hours. Click here to verify your identity: http://secure-update-bank.com",
-                answer: "P",
-                explanation: "Phishing! Banks rarely use high-pressure urgency tactics, and the link does not look like a standard bank URL."
-            },
-            {
-                message: "Hi team, please find the attached meeting notes from today's sync. - Alice (HR)",
-                answer: "S",
-                explanation: "Safe! This is a standard internal communication without suspicious links or requests for passwords."
-            },
-            {
-                message: "Congratulations! You won a free iPhone. Reply with your password to claim your prize.",
-                answer: "P",
-                explanation: "Phishing! If it sounds too good to be true, it is. Never share your password."
+        const outputDiv = document.getElementById('terminal-output');
+        const inputField = document.getElementById('command-input');
+
+        // 1. Listen for the Enter key to be pressed
+        inputField.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const command = inputField.value.trim();
+                
+                // Echo the command to the screen like a real terminal
+                printOutput(`root@player:~# ${command}`);
+                
+                // Run the game logic
+                processCommand(command);
+                
+                // Clear the input and scroll to the bottom
+                inputField.value = '';
+                outputDiv.scrollTop = outputDiv.scrollHeight; 
             }
-        ];
+        });
 
-        let currentScenario = 0;
-        let score = 0;
-
-        // 2. Update Screen Function
-        function updateScreen() {
-            document.getElementById("scenario-message").innerText = scenarios[currentScenario].message;
+        // 2. Helper function to print text to our terminal window
+        function printOutput(text) {
+            const newLine = document.createElement('div');
+            newLine.textContent = text;
+            outputDiv.appendChild(newLine);
         }
 
-        // 3. Game Logic Function
-        function checkAnswer(userGuess) {
-            let item = scenarios[currentScenario];
-            
-            if (userGuess === item.answer) {
-                score++;
-                alert("Correct! Excellent job.\n\n" + item.explanation);
-            } else {
-                alert("Incorrect.\n\n" + item.explanation);
-            }
-            
-            currentScenario++;
-            
-            if (currentScenario < scenarios.length) {
-                updateScreen();
-            } else {
-                alert("Game Over! Your final score is " + score + " out of " + scenarios.length + ".\nKeep practicing!");
-                // Reset the game
-                currentScenario = 0;
-                score = 0;
-                updateScreen();
+        // 3. Game Logic: Process the simulated Linux commands
+        function processCommand(cmd) {
+            // Split the input into an array (e.g., "nmap 10.0.0.5" becomes ["nmap", "10.0.0.5"])
+            const args = cmd.split(' ');
+            const baseCommand = args[0].toLowerCase();
+
+            switch(baseCommand) {
+                case 'help':
+                    printOutput("Available commands: help, clear, ls, cat, nmap");
+                    break;
+                case 'clear':
+                    outputDiv.innerHTML = ''; // Wipes the screen
+                    break;
+                case 'ls':
+                    printOutput("target_ips.txt   mission_brief.md   flag.txt");
+                    break;
+                case 'cat':
+                    if (args[1] === "flag.txt") {
+                        printOutput("Permission denied. You must escalate privileges.");
+                    } else if (args[1] === "target_ips.txt") {
+                        printOutput("192.168.1.100\n192.168.1.101");
+                    } else {
+                        printOutput("cat: missing or invalid file name.");
+                    }
+                    break;
+                case 'nmap':
+                    // Check if they provided an IP address to scan
+                    if (args[1] === "192.168.1.100") {
+                        printOutput(`Starting Nmap scan on ${args[1]}...`);
+                        // setTimeout creates a slight delay to simulate a real scan taking time
+                        setTimeout(() => {
+                            printOutput(`PORT   STATE SERVICE\n22/tcp open  ssh\n80/tcp open  http`);
+                            outputDiv.scrollTop = outputDiv.scrollHeight; // Auto-scroll again after delay
+                        }, 1500);
+                    } else if (args[1]) {
+                        printOutput(`Starting Nmap scan on ${args[1]}...\nHost seems down. If it is really up, but blocking our ping probes, try -Pn`);
+                    } else {
+                        printOutput("Usage: nmap [target_ip]");
+                    }
+                    break;
+                case '':
+                    break; // Do nothing if they just press Enter on a blank line
+                default:
+                    printOutput(`bash: ${baseCommand}: command not found`);
             }
         }
-
-        // Start the game by loading the first scenario
-        updateScreen();
     </script>
-
 </body>
 </html>
