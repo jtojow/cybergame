@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cybersecurity Phishing Simulator</title>
+    <!-- CSS is used to style the app and make it look nice -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+        }
+        .game-window {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+            width: 450px;
+            text-align: center;
+        }
+        #scenario-message {
+            color: blue;
+            font-size: 18px;
+            margin: 20px 0;
+            min-height: 80px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: 2px solid #333;
+            background-color: white;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HTML creates the visible elements on the screen -->
+    <div class="game-window">
+        <h2>Is this message Safe or Phishing?</h2>
+        <p id="scenario-message">Loading message...</p>
+        
+        <!-- These buttons trigger our JavaScript function when clicked -->
+        <button onclick="checkAnswer('S')">Safe</button>
+        <button onclick="checkAnswer('P')">Phishing</button>
+    </div>
+
+    <!-- JavaScript handles the game logic, just like our Python code did -->
+    <script>
+        // 1. Game Data
+        const scenarios = [
+            {
+                message: "URGENT: Your bank account will be locked in 24 hours. Click here to verify your identity: http://secure-update-bank.com",
+                answer: "P",
+                explanation: "Phishing! Banks rarely use high-pressure urgency tactics, and the link does not look like a standard bank URL."
+            },
+            {
+                message: "Hi team, please find the attached meeting notes from today's sync. - Alice (HR)",
+                answer: "S",
+                explanation: "Safe! This is a standard internal communication without suspicious links or requests for passwords."
+            },
+            {
+                message: "Congratulations! You won a free iPhone. Reply with your password to claim your prize.",
+                answer: "P",
+                explanation: "Phishing! If it sounds too good to be true, it is. Never share your password."
+            }
+        ];
+
+        let currentScenario = 0;
+        let score = 0;
+
+        // 2. Update Screen Function
+        function updateScreen() {
+            document.getElementById("scenario-message").innerText = scenarios[currentScenario].message;
+        }
+
+        // 3. Game Logic Function
+        function checkAnswer(userGuess) {
+            let item = scenarios[currentScenario];
+            
+            if (userGuess === item.answer) {
+                score++;
+                alert("Correct! Excellent job.\n\n" + item.explanation);
+            } else {
+                alert("Incorrect.\n\n" + item.explanation);
+            }
+            
+            currentScenario++;
+            
+            if (currentScenario < scenarios.length) {
+                updateScreen();
+            } else {
+                alert("Game Over! Your final score is " + score + " out of " + scenarios.length + ".\nKeep practicing!");
+                // Reset the game
+                currentScenario = 0;
+                score = 0;
+                updateScreen();
+            }
+        }
+
+        // Start the game by loading the first scenario
+        updateScreen();
+    </script>
+
+</body>
+</html>
