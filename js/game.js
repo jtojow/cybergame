@@ -47,7 +47,9 @@ function exitToHub() {
     hubScreen.style.display = 'flex';
 }
 
-function updatePrompt() { promptText.textContent = isRoot ? "root@target:~#" : "player@kali:~#"; }
+function updatePrompt() { 
+    promptText.textContent = isRoot ? "root@target:~#" : "player@kali:~#"; 
+}
 
 // --- BURP SUITE LOGIC ---
 function triggerIntercept() {
@@ -98,11 +100,19 @@ inputField.addEventListener('keydown', function(e) {
         outputDiv.scrollTop = outputDiv.scrollHeight; 
     } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        if (historyIndex > 0) { historyIndex--; inputField.value = commandHistory[historyIndex]; }
+        if (historyIndex > 0) {
+            historyIndex--;
+            inputField.value = commandHistory[historyIndex];
+        }
     } else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        if (historyIndex < commandHistory.length - 1) { historyIndex++; inputField.value = commandHistory[historyIndex];
-        } else { historyIndex = commandHistory.length; inputField.value = ''; }
+        if (historyIndex < commandHistory.length - 1) {
+            historyIndex++;
+            inputField.value = commandHistory[historyIndex];
+        } else {
+            historyIndex = commandHistory.length;
+            inputField.value = ''; 
+        }
     }
 });
 
@@ -116,12 +126,21 @@ function processCommand(cmd) {
     const args = cmd.split(' ');
     const baseCommand = args[0].toLowerCase();
     switch(baseCommand) {
-        case 'help': printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, submit, exit"); break;
-        case 'clear': outputDiv.innerHTML = ''; break;
-        case 'exit': exitToHub(); break;
-        case 'whoami': printOutput(isRoot ? "root" : "player"); break;
-        case 'pwd': printOutput(isRoot ? "/root" : "/home/player"); break;
-        
+        case 'help': 
+            printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, submit, exit"); 
+            break;
+        case 'clear': 
+            outputDiv.innerHTML = ''; 
+            break;
+        case 'exit': 
+            exitToHub(); 
+            break;
+        case 'whoami': 
+            printOutput(isRoot ? "root" : "player"); 
+            break;
+        case 'pwd': 
+            printOutput(isRoot ? "/root" : "/home/player"); 
+            break;
         case 'ls':
             if (currentLevel == 1) {
                 printOutput("target_ips.txt   mission_brief.md   flag.txt");
@@ -131,7 +150,6 @@ function processCommand(cmd) {
                 printOutput("Directory is empty or unavailable.");
             }
             break;
-            
         case 'cat':
             if (currentLevel == 1) {
                 if (args[1] === "flag.txt") {
@@ -157,7 +175,6 @@ function processCommand(cmd) {
                 printOutput("cat: missing or invalid file name.");
             }
             break;
-            
         case 'nmap':
             if (currentLevel != 1) {
                 printOutput("nmap: command not found or network unavailable.");
@@ -186,13 +203,15 @@ function processCommand(cmd) {
                 outputDiv.scrollTop = outputDiv.scrollHeight; 
             }, 1500);
             break;
-            
         case 'ssh':
             if (currentLevel == 1 && args[1] === "root@192.168.1.100" && args[2] === "admin123") {
-                isRoot = true; updatePrompt(); printOutput("Authentication successful. Welcome, root.");
-            } else printOutput("Usage: ssh [user]@[ip] [password]");
+                isRoot = true; 
+                updatePrompt(); 
+                printOutput("Authentication successful. Welcome, root.");
+            } else {
+                printOutput("Usage: ssh [user]@[ip] [password]");
+            }
             break;
-            
         case 'grep':
             if (currentLevel == 1 && args[2] === "mission_brief.md") {
                 const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
@@ -201,13 +220,15 @@ function processCommand(cmd) {
             } else if (currentLevel == 2 && args[2] === "server_logs.txt") {
                 const logContent = "[INFO] User admin logged in from 10.0.0.5\n[INFO] Failed login attempt for user root from 192.168.1.50\n[WARN] Multiple failed logins from 192.168.1.50\n[CRITICAL] Unauthorized access detected from 203.0.113.42\n[INFO] System backup completed successfully";
                 const matches = logContent.split('\n').filter(line => line.toLowerCase().includes(args[1].toLowerCase()));
-                if (matches.length > 0) matches.forEach(match => printOutput(match));
-                else printOutput("grep: no matches found.");
+                if (matches.length > 0) {
+                    matches.forEach(match => printOutput(match));
+                } else {
+                    printOutput("grep: no matches found.");
+                }
             } else {
                 printOutput("grep: Invalid usage or file.");
             }
             break;
-            
         case 'submit':
             if (currentLevel == 2) {
                 if (args[1] === "203.0.113.42") {
@@ -222,8 +243,9 @@ function processCommand(cmd) {
                 printOutput("submit: command not found");
             }
             break;
-
-        case '': break; 
-        default: printOutput(`bash: ${baseCommand}: command not found`);
+        case '': 
+            break; 
+        default: 
+            printOutput(`bash: ${baseCommand}: command not found`);
     }
 }
