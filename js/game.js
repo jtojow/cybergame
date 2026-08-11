@@ -24,7 +24,6 @@ function startLevel(levelNumber) {
     terminalScreen.style.display = 'none';
     burpScreen.style.display = 'none';
     
-    // UPDATED: Using == for loose equality
     if (currentLevel == 1 || currentLevel == 2) {
         terminalScreen.style.display = 'flex';
         outputDiv.innerHTML = '';
@@ -124,7 +123,6 @@ function processCommand(cmd) {
         case 'pwd': printOutput(isRoot ? "/root" : "/home/player"); break;
         
         case 'ls':
-            // UPDATED: Using == for loose equality
             if (currentLevel == 1) {
                 printOutput("target_ips.txt   mission_brief.md   flag.txt");
             } else if (currentLevel == 2) {
@@ -135,7 +133,6 @@ function processCommand(cmd) {
             break;
             
         case 'cat':
-            // UPDATED: Using == for loose equality
             if (currentLevel == 1) {
                 if (args[1] === "flag.txt") {
                     if (isRoot) printOutput("CTF{y0u_h4ck3d_th3_m41nfr4m3}\nCONGRATULATIONS! You beat Exercise 1!");
