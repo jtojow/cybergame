@@ -253,7 +253,7 @@ username=${user}&password=guest123&role=user`;
             const args = cmd.split(' ');
             const baseCommand = args[0].toLowerCase();
             switch(baseCommand) {
-                case 'help': printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, submit, exit"); break;
+                case 'help': printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep, curl, exit"); break;
                 case 'clear': outputDiv.innerHTML = ''; break;
                 case 'exit': exitToHub(); break;
                 case 'whoami': printOutput(isRoot ? "root" : "player"); break;
@@ -362,6 +362,22 @@ username=${user}&password=guest123&role=user`;
 
                 case '': break; 
                 default: printOutput(`bash: ${baseCommand}: command not found`);
+                    case 'curl':
+            if (currentLevel === 2) {
+                // Check if the user is targeting the firewall API and passing the correct IP
+                const fullCmd = args.join(' ');
+                if (fullCmd.includes("http://127.0.0.1/api/firewall") && fullCmd.includes("ip=203.0.113.42")) {
+                    printOutput('{"status": "success", "message": "IP Address blocked by firewall rule."}');
+                    printOutput("SUCCESS! Flag: CTF{r34l_w0rld_cur1_m4st3r}");
+                } else if (fullCmd.includes("http://127.0.0.1/api/firewall")) {
+                    printOutput('{"status": "error", "message": "Invalid or missing IP parameter."}');
+                } else {
+                    printOutput("curl: (7) Failed to connect to host connection refused");
+                }
+            } else {
+                printOutput("curl: (6) Could not resolve host");
+            }
+            break;
             }
         }
     </script>
