@@ -2,20 +2,84 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CTF Terminal Simulator</title>
-    <!-- CSS for the hacker terminal aesthetic -->
+    <title>CTF Hacker Game</title>
     <style>
+        /* General page styling */
         body {
             background-color: #0c0c0c;
             color: #00ff00;
             font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
             margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+        }
+
+        /* 1. THE HUB SCREEN STYLES */
+        #hub-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Changed to allow scrolling if we get many levels */
+            padding-top: 50px;
+            height: 100%;
+            text-align: center;
+            overflow-y: auto; /* Allows scrolling down if the menu gets too tall */
+        }
+        
+        .hub-title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        /* NEW: Styles for our Theme groupings */
+        .theme-section {
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            width: 80%;
+            max-width: 600px;
+            background-color: #111;
+        }
+
+        .theme-title {
+            font-size: 1.5em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .level-btn {
+            background-color: #00ff00;
+            color: #0c0c0c;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1.1em;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            width: 100%; /* Makes buttons fill the theme box neatly */
+        }
+
+        .level-btn:hover {
+            background-color: #00cc00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        /* 2. THE TERMINAL SCREEN STYLES */
+        #terminal-screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
             box-sizing: border-box;
         }
+
         #terminal-output {
             flex-grow: 1;
             overflow-y: auto;
@@ -23,15 +87,10 @@
             white-space: pre-wrap;
             font-size: 16px;
         }
-        .input-line {
-            display: flex;
-            font-size: 16px;
-        }
-        .prompt {
-            margin-right: 10px;
-            color: #00ff00;
-        }
-        /* Makes the input field blend into the terminal background */
+
+        .input-line { display: flex; font-size: 16px; }
+        .prompt { margin-right: 10px; color: #00ff00; }
+        
         input[type="text"] {
             background-color: transparent;
             border: none;
@@ -45,14 +104,34 @@
 </head>
 <body>
 
-    <!-- HTML: The visual structure of the terminal -->
-    <div id="terminal-output">Welcome to CTF-OS v1.0.0
-System initialized. Type 'help' to see available commands.
-</div>
-    <div class="input-line">
-        <span class="prompt">root@player:~#</span>
-        <input type="text" id="command-input" autocomplete="off" autofocus>
+    <!-- THE UPDATED HUB SCREEN HTML -->
+    <div id="hub-screen">
+        <div class="hub-title">CTF TRAINING HUB</div>
+
+        <!-- THEME 1: Terminal & Network Basics -->
+        <div class="theme-section">
+            <h2 class="theme-title">Theme 1: Terminal & Network Recon</h2>
+            <button class="level-btn" onclick="startLevel(1)">Level 1: The SSH Backdoor</button>
+            <button class="level-btn" onclick="startLevel(2)">Level 2: Log Analysis (Coming Soon)</button>
+        </div>
+
+        <!-- THEME 2: Web Vulnerabilities -->
+        <div class="theme-section">
+            <h2 class="theme-title">Theme 2: Web App Penetration</h2>
+            <button class="level-btn" onclick="startLevel(3)">Level 1: Burp Suite Simulator (Coming Soon)</button>
+        </div>
     </div>
+
+    <!-- THE TERMINAL SCREEN HTML -->
+    <div id="terminal-screen">
+        <div id="terminal-output"></div>
+        <div class="input-line">
+            <span class="prompt" id="prompt-text">player@kali:~#</span>
+            <input type="text" id="command-input" autocomplete="off">
+        </div>
+    </div>
+
+    <!-- Your existing <script> tags go here! -->
 
     <!-- JavaScript: The engine that processes the commands -->
   <script>
