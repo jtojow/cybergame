@@ -301,26 +301,46 @@ username=${user}&password=guest123&role=user`;
                         else printOutput("cat: missing or invalid file name.");
                     } else printOutput("cat: missing or invalid file name.");
                     break;
-                case 'nmap':
-                    if (currentLevel === 1 && args[1] === "192.168.1.100") {
-                        printOutput(`Starting Nmap scan on ${args[1]}...`);
-                        setTimeout(() => { printOutput(`PORT   STATE SERVICE\n22/tcp open  ssh\n80/tcp open  http`); outputDiv.scrollTop = outputDiv.scrollHeight; }, 1500);
-                    } else printOutput("Usage: nmap [target_ip]");
+               case 'nmap':
+                    // First, check if they are on Level 1
+                    if (currentLevel !== 1) {
+                        printOutput("nmap: command not found or network unavailable.");
+                        break;
+                    }
+
+                    // Rejoin the array into a single string so we can easily search it
+                    const fullCommand = args.join(' ');
+                    const targetIP = "192.168.1.100";
+
+                    // Check if they included the correct IP anywhere in the command
+                    if (!fullCommand.includes(targetIP)) {
+                        printOutput("Usage: nmap [flags] [target_ip]");
+                        printOutput("Hint: Did you check your target_ips.txt file?");
+                        break;
+                    }
+
+                    // Detect if the player used the version scan flag
+                    const usedVersionFlag = fullCommand.includes('-sV');
+
+                    printOutput(`Starting Nmap scan on ${targetIP}...`);
+                    
+                    // Simulate the scan delay
+                    setTimeout(() => {
+                        if (usedVersionFlag) {
+                            // Detailed output if they used the pro flag
+                            printOutput(`PORT   STATE SERVICE VERSION`);
+                            printOutput(`22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5`);
+                            printOutput(`80/tcp open  http    Apache httpd 2.4.41`);
+                        } else {
+                            // Basic output and a hint if they didn't use the flag
+                            printOutput(`PORT   STATE SERVICE`);
+                            printOutput(`22/tcp open  ssh`);
+                            printOutput(`80/tcp open  http`);
+                            printOutput(`\nHint: Try using the '-sV' flag to determine the service versions!`);
+                        }
+                        outputDiv.scrollTop = outputDiv.scrollHeight; 
+                    }, 1500);
                     break;
-                case 'ssh':
-                    if (currentLevel === 1 && args[1] === "root@192.168.1.100" && args[2] === "admin123") {
-                        isRoot = true; updatePrompt(); printOutput("Authentication successful. Welcome, root.");
-                    } else printOutput("Usage: ssh [user]@[ip] [password]");
-                    break;
-                case 'grep':
-                    if (currentLevel === 1 && args[2] === "mission_brief.md") {
-                        const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
-                        const match = fileContent.split('\n').find(line => line.toLowerCase().includes(args[1].toLowerCase()));
-                        if (match) printOutput(match); 
-                    } else printOutput("grep: Invalid usage or file.");
-                    break;
-                case '': break; 
-                default: printOutput(`bash: ${baseCommand}: command not found`);
             }
         }
     </script>
