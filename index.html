@@ -55,18 +55,27 @@ System initialized. Type 'help' to see available commands.
     </div>
 
     <!-- JavaScript: The engine that processes the commands -->
-   <script>
+  <script>
         const outputDiv = document.getElementById('terminal-output');
         const inputField = document.getElementById('command-input');
         
-        // Tracks if the player has hacked the server
         let isRoot = false; 
+        
+        // NEW: Variables to track command history
+        let commandHistory = [];
+        let historyIndex = -1;
 
-        inputField.addEventListener('keypress', function(e) {
+        // UPDATED: Changed from 'keypress' to 'keydown' to detect arrow keys
+        inputField.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const command = inputField.value.trim();
                 
-                // Change the prompt dynamically based on if they are root or not
+                // NEW: Save the command to history if it's not empty
+                if (command !== '') {
+                    commandHistory.push(command);
+                }
+                historyIndex = commandHistory.length; // Reset index to the bottom of the list
+                
                 const promptString = isRoot ? "root@target:~# " : "player@kali:~# ";
                 printOutput(promptString + command);
                 
@@ -74,6 +83,24 @@ System initialized. Type 'help' to see available commands.
                 
                 inputField.value = '';
                 outputDiv.scrollTop = outputDiv.scrollHeight; 
+
+            } else if (e.key === 'ArrowUp') {
+                // NEW: Handle Up Arrow
+                e.preventDefault(); // Stops the text cursor from jumping to the beginning
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    inputField.value = commandHistory[historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                // NEW: Handle Down Arrow
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    inputField.value = commandHistory[historyIndex];
+                } else {
+                    historyIndex = commandHistory.length;
+                    inputField.value = ''; // Clear the input if they scroll back to the very bottom
+                }
             }
         });
 
@@ -89,7 +116,7 @@ System initialized. Type 'help' to see available commands.
 
             switch(baseCommand) {
                 case 'help':
-                    printOutput("Available commands: help, clear, ls, cat, nmap, ssh");
+                    printOutput("Available commands: help, clear, ls, cat, nmap, ssh, whoami, pwd, grep");
                     break;
                 case 'clear':
                     outputDiv.innerHTML = ''; 
@@ -133,6 +160,40 @@ System initialized. Type 'help' to see available commands.
                         printOutput("Usage: ssh [user]@[ip] [password]\nHint: Check your files for credentials.");
                     }
                     break;
+                
+                // NEW: whoami command
+                case 'whoami':
+                    printOutput(isRoot ? "root" : "player");
+                    break;
+
+                // NEW: pwd (print working directory) command
+                case 'pwd':
+                    printOutput(isRoot ? "/root" : "/home/player");
+                    break;
+
+                // NEW: grep (search text) command
+                case 'grep':
+                    if (!args[1] || !args[2]) {
+                        printOutput("Usage: grep [search_term] [file_name]");
+                    } else if (args[2] === "mission_brief.md") {
+                        // Store the file content to search through
+                        const fileContent = "MISSION: Infiltrate the target server.\nINTEL: The admins often use the default password 'admin123' for SSH.";
+                        
+                        // Split the content into an array of individual lines
+                        const lines = fileContent.split('\n');
+                        
+                        // Look for a line that includes the player's search term
+                        const match = lines.find(line => line.toLowerCase().includes(args[1].toLowerCase()));
+                        
+                        if (match) {
+                            printOutput(match); // Print the line if found
+                        }
+                        // If no match is found, grep typically prints nothing, so we do nothing here.
+                    } else {
+                        printOutput(`grep: ${args[2]}: No such file or directory`);
+                    }
+                    break;
+
                 case '':
                     break; 
                 default:
