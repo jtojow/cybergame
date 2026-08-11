@@ -122,14 +122,14 @@ function processCommand(cmd) {
         case 'whoami': printOutput(isRoot ? "root" : "player"); break;
         case 'pwd': printOutput(isRoot ? "/root" : "/home/player"); break;
         case 'ls':
-            if (currentLevel === 1) {
-                printOutput("target_ips.txt   mission_brief.md   flag.txt");
-            } else if (currentLevel === 2) {
-                printOutput("instructions.txt   server_logs.txt");
-            } else {
-                printOutput("Directory is empty or unavailable.");
-            }
-            break;
+    if (currentLevel === 1) {
+        printOutput("target_ips.txt   mission_brief.md   flag.txt");
+    } else if (currentLevel === 2) {
+        printOutput("instructions.txt   server_logs.txt");
+    } else {
+        printOutput("Directory is empty or unavailable.");
+    }
+    break;
             
         case 'cat':
             if (currentLevel === 1) {
